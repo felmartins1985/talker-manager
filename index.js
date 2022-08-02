@@ -72,7 +72,7 @@ async (req, res) => {
   await fs.writeFile('talker.json', JSON.stringify(talkers, null, 2));
   return res.status(201).json(newTalker);
 });
-//
+// req 6
 app.put('/talker/:id', verifyToken,
 verifyName, verifyAge,
 verifyTalkAndWatched, verifyRate, async (req, res) => {
@@ -83,6 +83,18 @@ verifyTalkAndWatched, verifyRate, async (req, res) => {
   talkers[findTalker] = { ...req.body, id: Number(id) };
   await fs.writeFile('talker.json', JSON.stringify(talkers, null, 2));
   return res.status(200).json(talkers[findTalker]);
+});
+// req 7
+app.delete('/talker/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const talkers = JSON.parse(readTalkers);
+ const filterTalker = talkers.filter((t) => t.id !== Number(id));
+  // const findTalker = talkers.findIndex((t) => t.id === Number(id));
+  // if (findTalker === -1) return res.status(404).json({ message: 'Not found!' });
+  // talkers.splice(findTalker, 1);
+  await fs.writeFile('talker.json', JSON.stringify(filterTalker, null, 2));
+  return res.status(204).end();
 });
 //
 app.listen(PORT, () => {
