@@ -11,6 +11,8 @@ const verifyTalkAndWatched = require('./middleware/verifyTalk');
 const verifyToken = require('./middleware/verifyToken');
 
 //
+const FILE_TALKER = 'talker.json';
+//
 const app = express();
 app.use(bodyParser.json());
 
@@ -22,7 +24,7 @@ app.get('/', (_request, response) => {
 });
 // req 1
 app.get('/talker', async (req, res) => {
-    const readTalkers = await fs.readFile('talker.json', 'utf8');
+    const readTalkers = await fs.readFile(FILE_TALKER, 'utf8');
     const talkers = JSON.parse(readTalkers);
     if (!talkers || talkers.length === 0) {
      return res.status(200).json([]);
@@ -32,7 +34,7 @@ app.get('/talker', async (req, res) => {
 // requisito 2
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
-  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const readTalkers = await fs.readFile(FILE_TALKER, 'utf8');
   const talkers = JSON.parse(readTalkers);
   const findTalker = talkers.find((t) => t.id === Number(id));
   if (!findTalker) {
@@ -65,7 +67,7 @@ app.post('/talker', verifyToken,
 verifyName, verifyAge,
 verifyTalkAndWatched, verifyRate,
 async (req, res) => {
-  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const readTalkers = await fs.readFile(FILE_TALKER, 'utf8');
   const talkers = JSON.parse(readTalkers);
   const newTalker = { ...req.body, id: talkers.length + 1 };
   talkers.push(newTalker);
@@ -77,7 +79,7 @@ app.put('/talker/:id', verifyToken,
 verifyName, verifyAge,
 verifyTalkAndWatched, verifyRate, async (req, res) => {
   const { id } = req.params;
-  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const readTalkers = await fs.readFile(FILE_TALKER, 'utf8');
   const talkers = JSON.parse(readTalkers);
   const findTalker = talkers.findIndex((t) => t.id === Number(id));
   talkers[findTalker] = { ...req.body, id: Number(id) };
@@ -87,7 +89,7 @@ verifyTalkAndWatched, verifyRate, async (req, res) => {
 // req 7
 app.delete('/talker/:id', verifyToken, async (req, res) => {
   const { id } = req.params;
-  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const readTalkers = await fs.readFile(FILE_TALKER, 'utf8');
   const talkers = JSON.parse(readTalkers);
  const filterTalker = talkers.filter((t) => t.id !== Number(id));
   // const findTalker = talkers.findIndex((t) => t.id === Number(id));
