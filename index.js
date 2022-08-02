@@ -72,6 +72,19 @@ async (req, res) => {
   await fs.writeFile('talker.json', JSON.stringify(talkers, null, 2));
   return res.status(201).json(newTalker);
 });
+//
+app.put('/talker/:id', verifyToken,
+verifyName, verifyAge,
+verifyTalkAndWatched, verifyRate, async (req, res) => {
+  const { id } = req.params;
+  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const talkers = JSON.parse(readTalkers);
+  const findTalker = talkers.findIndex((t) => t.id === Number(id));
+  talkers[findTalker] = { ...req.body, id: Number(id) };
+  await fs.writeFile('talker.json', JSON.stringify(talkers, null, 2));
+  return res.status(200).json(talkers[findTalker]);
+});
+//
 app.listen(PORT, () => {
   console.log('Online');
 });
