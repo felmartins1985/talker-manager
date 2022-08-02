@@ -2,7 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const crypto = require('crypto');
+//
 
+const verifyRate = require('./middleware/verifyRate');
+const verifyName = require('./middleware/verifyName');
+const verifyAge = require('./middleware/verifyAge');
+const verifyTalkAndWatched = require('./middleware/verifyTalk');
+const verifyToken = require('./middleware/verifyToken');
+
+//
 const app = express();
 app.use(bodyParser.json());
 
@@ -51,6 +59,18 @@ app.post('/login', (req, res) => {
   }
   const token = crypto.randomBytes(8).toString('hex');
   return res.status(200).json({ token });
+});
+// requisito 5
+app.post('/talker', verifyToken,
+verifyName, verifyAge,
+verifyTalkAndWatched, verifyRate,
+async (req, res) => {
+  const readTalkers = await fs.readFile('talker.json', 'utf8');
+  const talkers = JSON.parse(readTalkers);
+  const newTalker = { ...req.body, id: talkers.length + 1 };
+  talkers.push(newTalker);
+  await fs.writeFile('talker.json', JSON.stringify(talkers, null, 2));
+  return res.status(201).json(newTalker);
 });
 app.listen(PORT, () => {
   console.log('Online');
