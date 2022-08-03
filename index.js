@@ -31,6 +31,22 @@ app.get('/talker', async (req, res) => {
     }
     return res.status(200).json(talkers);
 });
+//
+// requisito 8
+app.get('/talker/search', verifyToken, async (req, res) => {
+  const { q } = req.query;
+  const readTalkers = await fs.readFile(FILE_TALKER, 'utf8');
+  const talkers = JSON.parse(readTalkers);
+  const filterTalker = talkers.filter((t) => t.name.includes(q));
+  if (filterTalker === undefined || filterTalker === '') {
+    return res.status(200).json(talkers);
+  }
+  if (!filterTalker) {
+    return res.status(200).json([]);
+  }
+  return res.status(200).json(filterTalker);
+});
+
 // requisito 2
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
@@ -42,6 +58,8 @@ app.get('/talker/:id', async (req, res) => {
   }
   return res.status(200).json(findTalker);
 });
+//------
+
 // requisito 3 e 4
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
